@@ -96,7 +96,7 @@ class PushNotificationService {
     final AndroidNotification? android = message.notification?.android;
     final AppleNotification? apple = message.notification?.apple;
     String logoPath =
-        "https://lh3.googleusercontent.com/4h2XkERxolE4FL97S1AwPucH48MwqbrLc63B5PvunkPoVHd_X1bKPfILsmzy-ZHTEuQ";
+        "https://lh3.googleusercontent.com/PouW-qaQoS6PU78Skf15qcwafxlXn9wv1q3rN3TbxFeO3c7XBVIaO_BQ-chZc0NRLGo";
     String imageUrl = logoPath;
 
     if(android != null){

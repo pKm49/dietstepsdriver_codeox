@@ -3,5 +3,5 @@ const apiEndPoint = "68.183.247.240:8069";
 
 const clientId = "y9P7ycEWDbPgCoRCetZvkCVBiumFfo";
 const clientSecret = "xcfcTlmDEN2lZtz41r8lJybwWrxhSq";
-const appStorePackageId = "com.codeox.nutriprodriver";
-const playStorePackageId = "com.nutribites.nutripro_driver";
+const appStorePackageId = "com.codeox.dietstepsdriver";
+const playStorePackageId = "com.codeox.dietstpsdriver";
