@@ -2,8 +2,7 @@ import 'package:dietstepsdriver/feature_modules/auth/ui/login.page.auth.dart';
 import 'package:dietstepsdriver/feature_modules/auth/ui/reset-password/reset_password.page.auth.dart';
 import 'package:dietstepsdriver/order_details.page.core.dart';
 import 'package:dietstepsdriver/orders.page.core.dart';
-import 'package:dietstepsdriver/shared_module/ui/pages/about.page.profile.dart';
-import 'package:dietstepsdriver/shared_module/ui/pages/settings.page.profile.dart';
+ import 'package:dietstepsdriver/shared_module/ui/pages/settings.page.profile.dart';
 import 'package:dietstepsdriver/gif_splash.page.core.dart';
 import 'package:dietstepsdriver/landing.page.core.dart';
 import 'package:dietstepsdriver/notifications.page.core.dart';
@@ -47,10 +46,6 @@ AppPages() => [
       GetPage(
         name: AppRouteNames.notificationsRoute,
         page: () => NotificationsPage_Core(),
-      ),
-      GetPage(
-        name: AppRouteNames.aboutPageRoute,
-        page: () => AboutPage_Profile(),
       ),
       GetPage(
         name: AppRouteNames.settingsPageRoute,

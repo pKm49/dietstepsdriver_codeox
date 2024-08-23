@@ -170,23 +170,7 @@ class MyProfilePage_Profile extends StatelessWidget {
                           ),
                         ),
 
-                        SizedBox(
-                          width: double.infinity,
-                          child: PrePostIconButton(
-                            specialColor: 0,
-                            onPressed: () {
-                                Get.toNamed(AppRouteNames.aboutPageRoute);
-                            },
-                            theme: 'dark',
-                            border: '',
-                            buttonTitle: "about_diet_done".tr,
-                            preIconData: Ionicons.help_circle_outline,
-                            postIconData:Localizations.localeOf(context)
-                                .languageCode
-                                .toString() ==
-                                'ar'? Ionicons.chevron_back :Ionicons.chevron_forward,
-                          ),
-                        ),
+
                         SizedBox(
                           width: double.infinity,
                           child: PrePostIconButton(
@@ -205,6 +189,26 @@ class MyProfilePage_Profile extends StatelessWidget {
                                 'ar'? Ionicons.chevron_back :Ionicons.chevron_forward,
                           ),
                         ),
+
+                        SizedBox(
+                          width: double.infinity,
+                          child: PrePostIconButton(
+
+                            specialColor: 0,
+                            onPressed: () {
+                              Get.toNamed(AppRouteNames.privacyRoute);
+                            },
+                            theme: 'dark',
+                            border: '',
+                            buttonTitle: "privacy_policies".tr,
+                            preIconData: Ionicons.lock_closed_outline,
+                            postIconData:Localizations.localeOf(context)
+                                .languageCode
+                                .toString() ==
+                                'ar'? Ionicons.chevron_back :Ionicons.chevron_forward,
+                          ),
+                        ),
+                        addVerticalSpace(APPSTYLE_SpaceLarge ),
 
                       ],
                     ),

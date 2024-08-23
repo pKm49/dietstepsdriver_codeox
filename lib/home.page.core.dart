@@ -266,6 +266,8 @@ class HomePage_Core extends StatelessWidget {
                         addHorizontalSpace(APPSTYLE_SpaceSmall),
                         Expanded(
                           child: Text(
+                            isSameDay(sharedController.selectedDate.value, DateTime.now().add(Duration(days: -1)))?
+                                "select_date".tr:
                             getShortFormattedDate(sharedController.selectedDate.value),
                             style: getBodyMediumStyle(context),
                           ),
@@ -333,10 +335,14 @@ class HomePage_Core extends StatelessWidget {
                         onPressed: () {
                           FocusManager.instance.primaryFocus?.unfocus();
                           if (sharedController.selectedShift.value.id !=-1 &&
-                              !sharedController.isOrdersFetching.value) {
+                              !isSameDay(sharedController.selectedDate.value, DateTime.now().add(Duration(days: -1))) &&
+
+                          !sharedController.isOrdersFetching.value) {
                             sharedController.getOrders(true);
                           }else{
-                            if(sharedController.selectedShift.value.id ==-1){
+                            if(isSameDay(sharedController.selectedDate.value, DateTime.now().add(Duration(days: -1)))){
+                              showSnackbar(context, "select_date".tr, "error");
+                            }else if(sharedController.selectedShift.value.id ==-1){
                               showSnackbar(context, "select_shift".tr, "error");
                             }
                           }
@@ -366,7 +372,9 @@ class HomePage_Core extends StatelessWidget {
   Future<void> _selectDate(BuildContext context) async {
     final DateTime? picked = await showDatePicker(
         context: context,
-        initialDate: sharedController.selectedDate.value,
+        initialDate:isSameDay(sharedController.selectedDate.value, DateTime.now().add(Duration(days: -1)))?
+        sharedController.selectedDate.value.add(Duration(days: 1)):
+        sharedController.selectedDate.value,
         initialEntryMode: DatePickerEntryMode.calendarOnly, // <- this
         firstDate:DateTime(2024),
         lastDate: DateTime(2101),
