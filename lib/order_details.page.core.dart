@@ -31,25 +31,12 @@ class OrderDetailsPage_Core extends StatefulWidget {
 
 class _OrderDetailsPage_CoreState extends State<OrderDetailsPage_Core> {
   final sharedController = Get.find<SharedController>();
-  var getArguments = Get.arguments;
 
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
-    if(getArguments == null){
-      showSnackbar(context, "cant_find_order".tr, "error");
-      Get.back();
-    }
-    if(getArguments[0] == null){
-      showSnackbar(context, "cant_find_order".tr, "error");
-      Get.back();
-    }
-    if(sharedController.myOrders.length<(getArguments[0]+1)){
-      showSnackbar(context, "cant_find_order".tr, "error");
-      Get.back();
-    }
-    sharedController.changeOrder(getArguments[0]);
+
   }
 
   @override
@@ -150,8 +137,6 @@ class _OrderDetailsPage_CoreState extends State<OrderDetailsPage_Core> {
                         children: [
                           UpdateProfilePic(
                             isLarge:false,
-                            onClick: () {
-                            },
                             borderColor: APPSTYLE_Black,
                             profilePictureUrl: sharedController.selectedOrder.value.image,
                           ),
@@ -165,6 +150,9 @@ class _OrderDetailsPage_CoreState extends State<OrderDetailsPage_Core> {
                             sharedController.selectedOrder.value.name,style: getHeadlineMediumStyle(context).copyWith(
                               fontWeight: APPSTYLE_FontWeightBold
                           ),)),
+                          addHorizontalSpace(APPSTYLE_SpaceSmall),
+
+                          Text('#${sharedController.selectedOrder.value.queue}',style: getHeadlineLargeStyle(context),)
 
                         ],
                       ),

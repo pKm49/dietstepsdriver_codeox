@@ -33,14 +33,7 @@ class OrdersPageBottomBar_Core extends StatelessWidget {
 
     return Obx(
           ()=> Scaffold(
-        floatingActionButton: !sharedController.selectedDate.value.isBefore(DateTime(DateTime.now().year,DateTime.now().month,DateTime.now().day))
-            && sharedController.selectedShift.value.id != -1
-            ? FloatingActionButton.extended(
-          onPressed: (){
-            sharedController.getAllMyOrders();
-          },
-          label: Text("View All",style: getBodyMediumStyle(context).copyWith(color: APPSTYLE_BackgroundWhite)),
-        ):Container(),
+
         appBar: AppBar(
           automaticallyImplyLeading: false,
           scrolledUnderElevation: 0.0,
@@ -60,56 +53,8 @@ class OrdersPageBottomBar_Core extends StatelessWidget {
                     title: "assigned_orders".tr ,
                   ),
 
-                  Container(
-                    padding: APPSTYLE_LargePaddingHorizontal,
-                    margin: EdgeInsets.only(bottom: APPSTYLE_SpaceMedium),
-                    child: Row(
-                      children: [
-                        Expanded(
-                          flex:2,
-                            child: InkWell(
-                              onTap: (){
-                                _selectDate(context);
-                              },
-                              child: Container(
-                                decoration:
-                                APPSTYLE_BorderedContainerExtraSmallDecoration,
-                                padding: APPSTYLE_SmallPaddingAll,
-                                child: Row(
-                                  children: [
-                                    Icon(Ionicons.calendar_outline),
-                                    addHorizontalSpace(APPSTYLE_SpaceSmall),
-                                    Expanded(
-                                      child: Text(
-                                          sharedController.selectedDate.value.isBefore(DateTime(DateTime.now().year,DateTime.now().month,DateTime.now().day))?
-                                              "select_date".tr:
-                                        getShortFormattedDate(sharedController.selectedDate.value),
-                                        style: getBodyMediumStyle(context),
-                                      ),
-                                    )
-                                  ],
-                                ),
-                              ),
-                            )),
-                        addHorizontalSpace(APPSTYLE_SpaceMedium),
-                        Expanded(
-                          flex: 1,
-                          child: DropDownSelector(
-                            titleText: 'shift'.tr,
-                            selected: sharedController.selectedShift.value.id,
-                            items: sharedController.userData.value.shifts,
-                            hintText: 'select_shift'.tr,
-                            valueChanged: (newShift) {
-                              sharedController.changeShif(int.parse(newShift),true);
-                            },
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-
                   // Visibility(
-                  //     visible:  !sharedController.isOrdersFetching.value && sharedController.myOrders.isNotEmpty,
+                  //     visible:  !sharedController.isOrdersFetching.value && sharedController.myOrdersAll.isNotEmpty,
                   //     child: Padding(
                   //   padding: APPSTYLE_LargePaddingHorizontal.copyWith(bottom: APPSTYLE_SpaceSmall),
                   //   child: Row(
@@ -157,7 +102,7 @@ class OrdersPageBottomBar_Core extends StatelessWidget {
                   // )),
 
                   Visibility(
-                    visible:  !sharedController.isOrdersFetching.value && sharedController.myOrdersToShow.isEmpty,
+                    visible:  !sharedController.isOrdersAllFetching.value && sharedController.myOrdersAll.isEmpty,
                     child: Expanded(
                         child: Column(
                           mainAxisAlignment: MainAxisAlignment.center,
@@ -188,13 +133,13 @@ class OrdersPageBottomBar_Core extends StatelessWidget {
                         )),
                   ),
                   Visibility(
-                    visible:  !sharedController.isOrdersFetching.value && sharedController.myOrdersToShow.isNotEmpty,
+                    visible:  !sharedController.isOrdersAllFetching.value && sharedController.myOrdersAll.isNotEmpty,
                     child: Expanded(
                         child: Container(
                           child: ListView(
                             children: [
                               addVerticalSpace(APPSTYLE_SpaceMedium),
-                              for(var i=0;i<sharedController.myOrdersToShow.length;i++ )
+                              for(var i=0;i<sharedController.myOrdersAll.length;i++ )
                                 InkWell(
                                   onTap:(){
                                       Get.toNamed(AppRouteNames.ordersDetails,arguments: [i]);
@@ -212,10 +157,8 @@ class OrdersPageBottomBar_Core extends StatelessWidget {
                                           children: [
                                             UpdateProfilePic(
                                               isLarge:false,
-                                              onClick: () {
-                                              },
                                               borderColor: APPSTYLE_Black,
-                                              profilePictureUrl: sharedController.myOrders[i].image,
+                                              profilePictureUrl: sharedController.myOrdersAll[i].image,
                                             ),
                                             addHorizontalSpace(APPSTYLE_SpaceSmall),
 
@@ -223,11 +166,13 @@ class OrdersPageBottomBar_Core extends StatelessWidget {
                                               Localizations.localeOf(context)
                                                   .languageCode
                                                   .toString() ==
-                                                  'ar'?sharedController.myOrders[i].arabicName:
-                                              sharedController.myOrders[i].name,style: getHeadlineMediumStyle(context).copyWith(
+                                                  'ar'?sharedController.myOrdersAll[i].arabicName:
+                                              sharedController.myOrdersAll[i].name,style: getHeadlineMediumStyle(context).copyWith(
                                                 fontWeight: APPSTYLE_FontWeightBold
                                             ),)),
+                                            addHorizontalSpace(APPSTYLE_SpaceSmall),
 
+                                            Text('#${sharedController.myOrdersAll[i].queue}',style: getHeadlineLargeStyle(context),)
                                           ],
                                         ),
                                         Divider(),
@@ -239,11 +184,11 @@ class OrdersPageBottomBar_Core extends StatelessWidget {
                                             addHorizontalSpace(APPSTYLE_SpaceSmall),
                                             Expanded(child:
                                             Text(
-                                                "${ sharedController.myOrders[i].area}, "
-                                                    " ${sharedController.myOrders[i].street} ${'street'.tr}, "
-                                                     "${sharedController.myOrders[i].jedha.trim()!='' ?('${sharedController.myOrders[i].jedha} '):''}${sharedController.myOrders[i].jedha.trim()!=''?('${'jedha'.tr},'):''}"
-                                                    "${sharedController.myOrders[i].houseNumber !=-1?'house_number'.tr:''} : ${sharedController.myOrders[i].houseNumber!=-1 ?sharedController.myOrders[i].houseNumber:''}"
-                                                    "${sharedController.myOrders[i].floorNumber !=-1?(', ${'floor_number'.tr} : '):''} ${sharedController.myOrders[i].floorNumber!=-1 ?sharedController.myOrders[i].floorNumber:''}" ,
+                                                "${ sharedController.myOrdersAll[i].area}, "
+                                                    " ${sharedController.myOrdersAll[i].street} ${'street'.tr}, "
+                                                     "${sharedController.myOrdersAll[i].jedha.trim()!='' ?('${sharedController.myOrdersAll[i].jedha} '):''}${sharedController.myOrdersAll[i].jedha.trim()!=''?('${'jedha'.tr},'):''}"
+                                                    "${sharedController.myOrdersAll[i].houseNumber !=-1?'house_number'.tr:''} : ${sharedController.myOrdersAll[i].houseNumber!=-1 ?sharedController.myOrdersAll[i].houseNumber:''}"
+                                                    "${sharedController.myOrdersAll[i].floorNumber !=-1?(', ${'floor_number'.tr} : '):''} ${sharedController.myOrdersAll[i].floorNumber!=-1 ?sharedController.myOrdersAll[i].floorNumber:''}" ,
 
                                              style: getHeadlineMediumStyle(context)))
 
@@ -255,9 +200,9 @@ class OrdersPageBottomBar_Core extends StatelessWidget {
                                           decoration:
                                           APPSTYLE_ShadowedContainerExtraSmallDecoration.copyWith(
                                               boxShadow: [  ],
-                                              color: sharedController.myOrders[i].status == 'pending'?
+                                              color: sharedController.myOrdersAll[i].status == 'pending'?
                                               APPSTYLE_GuideRed:
-                                              sharedController.myOrders[i].status == 'delivered'?
+                                              sharedController.myOrdersAll[i].status == 'delivered'?
                                               APPSTYLE_WhatsappGreen:APPSTYLE_PrimaryColorBg),
                                           padding: EdgeInsets.symmetric(
                                               vertical: APPSTYLE_SpaceSmall,
@@ -265,9 +210,9 @@ class OrdersPageBottomBar_Core extends StatelessWidget {
                                           child: Row(
                                             mainAxisAlignment: MainAxisAlignment.start,
                                             children: [
-                                              Icon(sharedController.myOrders[i].status == 'pending'?
+                                              Icon(sharedController.myOrdersAll[i].status == 'pending'?
                                               Icons.timer_outlined :
-                                              sharedController.myOrders[i].status == 'delivered'?
+                                              sharedController.myOrdersAll[i].status == 'delivered'?
                                               Icons.check_circle_outline :Icons.close,color: APPSTYLE_BackgroundWhite,
                                                   size: APPSTYLE_FontSize20),
                                               addHorizontalSpace(APPSTYLE_SpaceSmall),
@@ -277,9 +222,9 @@ class OrdersPageBottomBar_Core extends StatelessWidget {
                                                 child: FittedBox(
                                                   fit: BoxFit.scaleDown,
                                                   alignment: Alignment.centerLeft,
-                                                  child: Text(sharedController.myOrders[i].status == 'pending'?
+                                                  child: Text(sharedController.myOrdersAll[i].status == 'pending'?
                                                   "pending".tr:
-                                                  sharedController.myOrders[i].status == 'delivered'?
+                                                  sharedController.myOrdersAll[i].status == 'delivered'?
                                                   'delivered'.tr :'not_delivered'.tr,
                                                       style: getBodyMediumStyle(context).copyWith(
                                                           color: APPSTYLE_BackgroundWhite),
@@ -299,7 +244,7 @@ class OrdersPageBottomBar_Core extends StatelessWidget {
                         )),
                   ),
                   Visibility(
-                    visible: sharedController.isOrdersFetching.value,
+                    visible: sharedController.isOrdersAllFetching.value,
                     child: Expanded(
                         child: Container(
                           child: ListView(
@@ -389,27 +334,4 @@ class OrdersPageBottomBar_Core extends StatelessWidget {
 
 
 
-  Future<void> _selectDate(BuildContext context) async {
-    final DateTime? picked = await showDatePicker(
-      context: context,
-      initialDate: sharedController.selectedDate.value,
-      initialEntryMode: DatePickerEntryMode.calendarOnly, // <- this
-
-      firstDate:DateTime(2024),
-      lastDate: DateTime(2101),
-      builder: (BuildContext context, Widget? child) {
-        return Theme(
-          data: ThemeData.light().copyWith(
-            colorScheme: ColorScheme.light(
-              primary:
-              APPSTYLE_PrimaryColor, // Customize the color of the selected date
-            ),
-          ),
-          child: child!,
-        );
-      },);
-    if (picked != null && picked != sharedController.selectedDate.value) {
-      sharedController.changeDate(picked,true);
-    }
-  }
 }

@@ -23,15 +23,16 @@ class SharedController extends GetxController {
   var mobile = "".obs;
   var isUserDataFetching = false.obs;
   var isNotificationsFetching = false.obs;
-  var isOrdersFetching = false.obs;
+  var isOrdersAllFetching = false.obs;
+  var isOrdersCustomFetching = false.obs;
   var isDeviceTokenUpdating = false.obs;
   var selectedDate = DateTime.now().obs;
   var selectedShift = mapGeneralItem({}).obs;
   var userData = mapUserData({}).obs;
   var selectedOrder = mapMyOrder({}).obs;
   var notifications = <AppNotification>[].obs;
-  var myOrders = <MyOrder>[].obs;
-  var myOrdersToShow = <MyOrder>[].obs;
+  var myOrdersCustom = <MyOrder>[].obs;
+  var myOrdersAll = <MyOrder>[].obs;
   var supportNumber = "".obs;
   var selectedStatus = "all".obs;
 
@@ -132,7 +133,9 @@ class SharedController extends GetxController {
 
     }
   }
-
+  changeMobile(String mobile){
+    mobileTextEditingController.value.text = mobile;
+  }
   updateUserData(UserData tUserData) {
     userData.value = tUserData;
     if (userData.value.shifts.isNotEmpty){
@@ -140,8 +143,8 @@ class SharedController extends GetxController {
     }
   }
 
-  changeOrder(int index){
-    selectedOrder.value = myOrders[index];
+  changeOrder(MyOrder myOrder){
+    selectedOrder.value = myOrder;
   }
 
   saveDeviceToken() async {
@@ -245,24 +248,23 @@ class SharedController extends GetxController {
     }
 
     if(selectedShift.value.id != -1){
-      isOrdersFetching.value = true;
+      isOrdersCustomFetching.value = true;
       if(isNavigationRequired){
         Get.toNamed(AppRouteNames.ordersList);
       }
       var sharedHttpService = SharedHttpService();
       final f = new DateFormat('yyyy-MM-dd');
-      myOrders.value =
+      myOrdersCustom.value =
       await sharedHttpService.getMyOrders( mobile.value,f.format(selectedDate.value),selectedShift.value.id.toString());
-      myOrdersToShow.value = myOrders;
-      selectedStatus.value = VALIDORDER_STATUS.all.name;
+       selectedStatus.value = VALIDORDER_STATUS.all.name;
       if(selectedOrder.value.id != -1 &&
-      myOrders.indexOf((element) => element.id==selectedOrder.value.id) != -1){
-        changeOrder(myOrders.indexOf((element) => element.id==selectedOrder.value.id));
+          myOrdersCustom.indexOf((element) => element.id==selectedOrder.value.id) != -1){
+        changeOrder(selectedOrder.value);
       }
 
       orderStatus.value = "";
 
-      isOrdersFetching.value = false;
+      isOrdersCustomFetching.value = false;
     }else{
       print("didnt calle");
     }
@@ -270,21 +272,18 @@ class SharedController extends GetxController {
   }
 
   Future<void> getAllMyOrders() async {
-    isOrdersFetching.value = true;
+    isOrdersAllFetching.value = true;
     var sharedHttpService = SharedHttpService();
     final f = new DateFormat('dd-MM-yyyy');
-    myOrders.value =  await sharedHttpService.getAllMyOrders( mobile.value);
+    myOrdersAll.value =  await sharedHttpService.getAllMyOrders( mobile.value);
     if(selectedOrder.value.id != -1 &&
-        myOrders.indexOf((element) => element.id==selectedOrder.value.id) != -1){
-      changeOrder(myOrders.indexOf((element) => element.id==selectedOrder.value.id));
+        myOrdersAll.indexOf((element) => element.id==selectedOrder.value.id) != -1){
+      changeOrder(selectedOrder.value);
     }
-    myOrdersToShow.value = myOrders;
     selectedStatus.value = VALIDORDER_STATUS.all.name;
 
     orderStatus.value = "";
-    selectedDate.value = DateTime.now().add(Duration(days: -1));
-    selectedShift.value = mapGeneralItem({ });
-    isOrdersFetching.value = false;
+    isOrdersAllFetching.value = false;
   }
 
   Future<void> getNotifications() async {
@@ -399,13 +398,5 @@ class SharedController extends GetxController {
 
   }
 
-  changeOrderStatusFilter(String status){
-    selectedStatus.value = status;
-    if(status=='all'){
-      myOrdersToShow.value = myOrders;
-    }else{
-      List<MyOrder> tOrders = myOrders.where((p0) => p0.status==status).toList();
-      myOrdersToShow.value = tOrders;
-    }
-  }
+
 }

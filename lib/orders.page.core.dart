@@ -119,7 +119,7 @@ class OrdersPage_Core extends StatelessWidget {
                     ),
                   ),
                   Visibility(
-                    visible:  !sharedController.isOrdersFetching.value && sharedController.myOrders.isEmpty,
+                    visible:  !sharedController.isOrdersCustomFetching.value && sharedController.myOrdersCustom.isEmpty,
                     child: Expanded(
                         child: Column(
                           mainAxisAlignment: MainAxisAlignment.center,
@@ -150,13 +150,13 @@ class OrdersPage_Core extends StatelessWidget {
                         )),
                   ),
                   Visibility(
-                    visible:  !sharedController.isOrdersFetching.value && sharedController.myOrders.isNotEmpty,
+                    visible:  !sharedController.isOrdersCustomFetching.value && sharedController.myOrdersCustom.isNotEmpty,
                     child: Expanded(
                         child: Container(
                           child: ListView(
                             children: [
                               addVerticalSpace(APPSTYLE_SpaceMedium),
-                              for(var i=0;i<sharedController.myOrders.length;i++ )
+                              for(var i=0;i<sharedController.myOrdersCustom.length;i++ )
                                 InkWell(
                                   onTap:(){
                                       Get.toNamed(AppRouteNames.ordersDetails,arguments: [i]);
@@ -175,10 +175,8 @@ class OrdersPage_Core extends StatelessWidget {
                                           children: [
                                             UpdateProfilePic(
                                               isLarge:false,
-                                              onClick: () {
-                                              },
                                               borderColor: APPSTYLE_Black,
-                                              profilePictureUrl: sharedController.myOrders[i].image,
+                                              profilePictureUrl: sharedController.myOrdersCustom[i].image,
                                             ),
                                             addHorizontalSpace(APPSTYLE_SpaceSmall),
 
@@ -186,10 +184,13 @@ class OrdersPage_Core extends StatelessWidget {
                                               Localizations.localeOf(context)
                                                   .languageCode
                                                   .toString() ==
-                                                  'ar'?sharedController.myOrders[i].arabicName:
-                                              sharedController.myOrders[i].name,style: getHeadlineMediumStyle(context).copyWith(
+                                                  'ar'?sharedController.myOrdersCustom[i].arabicName:
+                                              sharedController.myOrdersCustom[i].name,style: getHeadlineMediumStyle(context).copyWith(
                                                 fontWeight: APPSTYLE_FontWeightBold
                                             ),)),
+                                            addHorizontalSpace(APPSTYLE_SpaceSmall),
+
+                                            Text('#${sharedController.myOrdersCustom[i].queue}',style: getHeadlineLargeStyle(context),)
 
                                           ],
                                         ),
@@ -202,11 +203,11 @@ class OrdersPage_Core extends StatelessWidget {
                                             addHorizontalSpace(APPSTYLE_SpaceSmall),
                                             Expanded(child:
                                             Text(
-                                                "${ sharedController.myOrders[i].area}, "
-                                                    " ${sharedController.myOrders[i].street} ${'street'.tr}, "
-                                                     "${sharedController.myOrders[i].jedha.trim()!='' ?('${sharedController.myOrders[i].jedha} '):''}${sharedController.myOrders[i].jedha.trim()!=''?('${'jedha'.tr},'):''}"
-                                                    "${sharedController.myOrders[i].houseNumber !=-1?'house_number'.tr:''} : ${sharedController.myOrders[i].houseNumber!=-1 ?sharedController.myOrders[i].houseNumber:''}"
-                                                    "${sharedController.myOrders[i].floorNumber !=-1?(', ${'floor_number'.tr} : '):''} ${sharedController.myOrders[i].floorNumber!=-1 ?sharedController.myOrders[i].floorNumber:''}" ,
+                                                "${ sharedController.myOrdersCustom[i].area}, "
+                                                    " ${sharedController.myOrdersCustom[i].street} ${'street'.tr}, "
+                                                     "${sharedController.myOrdersCustom[i].jedha.trim()!='' ?('${sharedController.myOrdersCustom[i].jedha} '):''}${sharedController.myOrdersCustom[i].jedha.trim()!=''?('${'jedha'.tr},'):''}"
+                                                    "${sharedController.myOrdersCustom[i].houseNumber !=-1?'house_number'.tr:''} : ${sharedController.myOrdersCustom[i].houseNumber!=-1 ?sharedController.myOrdersCustom[i].houseNumber:''}"
+                                                    "${sharedController.myOrdersCustom[i].floorNumber !=-1?(', ${'floor_number'.tr} : '):''} ${sharedController.myOrdersCustom[i].floorNumber!=-1 ?sharedController.myOrdersCustom[i].floorNumber:''}" ,
 
                                              style: getHeadlineMediumStyle(context)))
 
@@ -222,14 +223,14 @@ class OrdersPage_Core extends StatelessWidget {
                                                             vertical:APPSTYLE_SpaceExtraSmall))),
                                                 child:  Row(
                                                   children: [
-                                                    Icon(sharedController.myOrders[i].status == 'pending'?
+                                                    Icon(sharedController.myOrdersCustom[i].status == 'pending'?
                                                       Icons.timer_outlined :
-                                                    sharedController.myOrders[i].status == 'delivered'?
+                                                    sharedController.myOrdersCustom[i].status == 'delivered'?
                                                     Icons.check_circle_outline :Icons.close,color: APPSTYLE_PrimaryColor,),
                                                     addHorizontalSpace(APPSTYLE_SpaceMedium),
-                                                    Text(sharedController.myOrders[i].status == 'pending'?
+                                                    Text(sharedController.myOrdersCustom[i].status == 'pending'?
                                                     "pending".tr:
-                                                    sharedController.myOrders[i].status == 'delivered'?
+                                                    sharedController.myOrdersCustom[i].status == 'delivered'?
                                                     'delivered'.tr :'not_delivered'.tr,
                                                         style: getHeadlineMediumStyle(context).copyWith(
                                                             color: APPSTYLE_PrimaryColor,fontWeight: APPSTYLE_FontWeightBold),
@@ -248,7 +249,7 @@ class OrdersPage_Core extends StatelessWidget {
                         )),
                   ),
                   Visibility(
-                    visible: sharedController.isOrdersFetching.value,
+                    visible: sharedController.isOrdersCustomFetching.value,
                     child: Expanded(
                         child: Container(
                           child: ListView(
