@@ -23,19 +23,20 @@ class SharedController extends GetxController {
   var mobile = "".obs;
   var isUserDataFetching = false.obs;
   var isNotificationsFetching = false.obs;
-  var isOrdersAllFetching = false.obs;
-  var isOrdersCustomFetching = false.obs;
+  var isOrdersFetching = false.obs;
   var isDeviceTokenUpdating = false.obs;
   var selectedDate = DateTime.now().obs;
   var selectedShift = mapGeneralItem({}).obs;
   var userData = mapUserData({}).obs;
   var selectedOrder = mapMyOrder({}).obs;
   var notifications = <AppNotification>[].obs;
-  var myOrdersCustom = <MyOrder>[].obs;
-  var myOrdersAll = <MyOrder>[].obs;
+  var myOrders = <MyOrder>[].obs;
+  var myOrdersToShow = <MyOrder>[].obs;
   var supportNumber = "".obs;
   var selectedStatus = "all".obs;
-
+  var pendingCount = 0.obs;
+  var deliveredCount = 0.obs;
+  var notDeliveredCount = 0.obs;
   //  Mobile Verification
   var isOtpVerifying = false.obs;
   var isPlanActivating = false.obs;
@@ -133,9 +134,7 @@ class SharedController extends GetxController {
 
     }
   }
-  changeMobile(String mobile){
-    mobileTextEditingController.value.text = mobile;
-  }
+
   updateUserData(UserData tUserData) {
     userData.value = tUserData;
     if (userData.value.shifts.isNotEmpty){
@@ -143,15 +142,21 @@ class SharedController extends GetxController {
     }
   }
 
-  changeOrder(MyOrder myOrder){
-    selectedOrder.value = myOrder;
+  changeOrder(int index){
+    if(index == -1){
+      selectedOrder.value  = mapMyOrder({});
+    }else{
+      selectedOrder.value = myOrdersToShow[index];
+    }
+
+    commentsTextEditingController.value.text = "";
   }
 
   saveDeviceToken() async {
     var sharedHttpService = SharedHttpService();
     String deviceToken = await getFirebaseMessagingToken();
     bool isSuccess = await sharedHttpService.saveDeviceToken(
-         mobile.value, deviceToken);
+        mobile.value, deviceToken);
   }
 
   fetchUserData(String targetRoute, String tMobile) async {
@@ -248,42 +253,28 @@ class SharedController extends GetxController {
     }
 
     if(selectedShift.value.id != -1){
-      isOrdersCustomFetching.value = true;
+      isOrdersFetching.value = true;
       if(isNavigationRequired){
         Get.toNamed(AppRouteNames.ordersList);
       }
       var sharedHttpService = SharedHttpService();
       final f = new DateFormat('yyyy-MM-dd');
-      myOrdersCustom.value =
+      myOrders.value =
       await sharedHttpService.getMyOrders( mobile.value,f.format(selectedDate.value),selectedShift.value.id.toString());
-       selectedStatus.value = VALIDORDER_STATUS.all.name;
-      if(selectedOrder.value.id != -1 &&
-          myOrdersCustom.indexOf((element) => element.id==selectedOrder.value.id) != -1){
-        changeOrder(selectedOrder.value);
-      }
+      myOrdersToShow.value = myOrders.where((p0) => p0.status=='pending').toList();
+        pendingCount.value = myOrders.where((p0) => p0.status=='pending').toList().length;
+        deliveredCount.value =myOrders.where((p0) => p0.status=='delivered').toList().length;
+        notDeliveredCount.value = myOrders.where((p0) => p0.status=='not-delivered').toList().length;
+      selectedStatus.value = VALIDORDER_STATUS.pending.name;
+
 
       orderStatus.value = "";
 
-      isOrdersCustomFetching.value = false;
+      isOrdersFetching.value = false;
     }else{
       print("didnt calle");
     }
 
-  }
-
-  Future<void> getAllMyOrders() async {
-    isOrdersAllFetching.value = true;
-    var sharedHttpService = SharedHttpService();
-    final f = new DateFormat('dd-MM-yyyy');
-    myOrdersAll.value =  await sharedHttpService.getAllMyOrders( mobile.value);
-    if(selectedOrder.value.id != -1 &&
-        myOrdersAll.indexOf((element) => element.id==selectedOrder.value.id) != -1){
-      changeOrder(selectedOrder.value);
-    }
-    selectedStatus.value = VALIDORDER_STATUS.all.name;
-
-    orderStatus.value = "";
-    isOrdersAllFetching.value = false;
   }
 
   Future<void> getNotifications() async {
@@ -386,17 +377,20 @@ class SharedController extends GetxController {
       if(isSuccess){
         Get.back();
         showSnackbar(Get.context!, "order_status_updated".tr, "info");
-        if(selectedDate.value.isBefore(DateTime(DateTime.now().year,DateTime.now().month,DateTime.now().day)) ||
-            selectedShift.value.id == -1){
-          getAllMyOrders();
-        }else{
-          getOrders(false);
-        }
+        getOrders(false);
 
       }
     }
 
   }
 
-
+  changeOrderStatusFilter(String status){
+    selectedStatus.value = status;
+    if(status=='all'){
+      myOrdersToShow.value = myOrders;
+    }else{
+      List<MyOrder> tOrders = myOrders.where((p0) => p0.status==status).toList();
+      myOrdersToShow.value = tOrders;
+    }
+  }
 }

@@ -61,9 +61,6 @@ class _LandingPage_CoreState extends State<LandingPage_Core>
     _tabController.addListener(() {
       setState(() {
         _currentIndex = _tabController.index;
-        if(_currentIndex==1){
-          sharedController.getAllMyOrders();
-        }
       });
     });
   }
